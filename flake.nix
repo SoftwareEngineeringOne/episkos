@@ -16,6 +16,9 @@
       in
       {
         devShells.default = pkgs.mkShell {
+          packages = with pkgs; [
+            sqlitebrowser
+          ];
           nativeBuildInputs = with pkgs; [
             bacon
             pkg-config
@@ -40,10 +43,16 @@
             librsvg
             libsoup_3
             pango
+            sqlx-cli
             webkitgtk_4_1
             openssl
           ];
+
+          shellHook = ''
+            export RUSTUP_TOOLCHAIN=stable
+          '';
         };
+
       }
     );
 }

@@ -7,6 +7,8 @@
 //! - **Files**: Enabled with the `files` feature, includes file handling and serialization utilities.
 //! - **Metadata**: Core utilities for managing project metadata.#[cfg(feature = "files")]
 
+#[cfg(feature = "db")]
+pub mod db;
 #[cfg(feature = "files")]
 pub mod files;
 pub mod metadata;

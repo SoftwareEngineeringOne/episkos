@@ -24,6 +24,15 @@ pub use language::Language;
 
 use crate::files::file_handler;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Category(String);
+
+impl From<&str> for Category {
+    fn from(value: &str) -> Self {
+        Category(value.to_string())
+    }
+}
+
 /// Core metadata structure containing information about a project.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Metadata {
@@ -31,7 +40,7 @@ pub struct Metadata {
     #[serde(skip)]
     directory: PathBuf,
     title: String,
-    categories: Vec<String>,
+    categories: Vec<Category>,
     languages: Vec<Language>,
     preffered_ide: Option<Ide>,
     build_systems: Vec<BuildSystem>,

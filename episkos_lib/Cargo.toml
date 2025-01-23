@@ -5,8 +5,10 @@ version.workspace = true
 license.workspace = true
 
 [features]
-default = ["files"]
+# Feature based dependencies?!
+default = ["files", "db"]
 files = []
+db = []
 
 [dependencies]
 chrono = { workspace = true, features = ["serde"] }
@@ -14,6 +16,9 @@ uuid.workspace = true
 thiserror.workspace = true
 toml = "0.8.19"
 serde = { version = "1.0.217", features = ["derive"] }
+sqlx = { version = "0.8.3", features = ["chrono", "runtime-tokio", "sqlite", "uuid"] }
+tokio = { version = "1.43.0", features = ["full"] }
+dotenvy = "0.15.7"
 
 [[bin]]
 name = "lib_debug"
