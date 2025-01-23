@@ -25,7 +25,7 @@ pub use language::Language;
 use crate::files::file_handler;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Category(String);
+pub struct Category(pub String);
 
 impl From<&str> for Category {
     fn from(value: &str) -> Self {

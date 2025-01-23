@@ -1,9 +1,9 @@
 use episkos_lib::{
     db::Db,
     files::File,
-    metadata::{Category, Metadata},
+    metadata::{Category, Language, Metadata},
 };
-use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::{Connection, SqliteConnection};
 use std::{error::Error, path::Path};
 
 #[tokio::main]
@@ -12,13 +12,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let connection_string = dotenvy::var("DATABASE_URL")?;
     println!("Initializing db...");
 
-    let category: Category = "Fun".into();
-    category.write_to_db().await?;
+    let mut connection = SqliteConnection::connect(&connection_string).await?;
+    // category.write_to_db(&mut connection).await?;
+    let category = Category::from_db(1, &mut connection).await?;
+    println!("Retrieved Category: {:#?}", category);
 
-    let pool = SqlitePoolOptions::new()
-        .max_connections(1)
-        .connect(&connection_string)
-        .await?;
+    let language = Language::from_db(1, &mut connection).await?;
+    println!("Received Language: {:#?}", language);
+
+    // let language = Language {
+    //     name: "rust".to_string(),
+    //     version: "1.84".to_string(),
+    // };
+    //
+    // language.write_to_db(&mut connection).await?;
     // let metadata = Metadata::builder()
     //     .title("Hello, World!")
     //     .directory(Path::new("./"))?

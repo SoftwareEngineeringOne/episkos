@@ -2,6 +2,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Language {
-    name: String,
-    version: String,
+    pub name: String,
+    pub version: String,
 }
