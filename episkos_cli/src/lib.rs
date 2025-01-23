@@ -4,7 +4,7 @@ use camino::Utf8PathBuf;
 
 pub fn create( data: Option<String> ) {
     // TODO: Get all information from the user in a interactive mode or given data and create a new manifest
-    if (data.is_none()) {
+    if data.is_none() {
         // Interactive mode
     } else {
         // Non-interactive mode

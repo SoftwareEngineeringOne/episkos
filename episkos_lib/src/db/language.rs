@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use sqlx::{query, query_as, sqlite::SqliteRow, Row};
+use sqlx::{query, Row};
 
 use crate::metadata::language::Language;
 

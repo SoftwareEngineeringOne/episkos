@@ -1,10 +1,9 @@
 use episkos_lib::{
     db::Db,
-    files::File,
-    metadata::{Category, Language, Metadata},
+    metadata::{Category, Language},
 };
 use sqlx::{Connection, SqliteConnection};
-use std::{error::Error, path::Path};
+use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
