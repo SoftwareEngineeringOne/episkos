@@ -1,45 +1,44 @@
-use std::future::Future;
-
 use sqlx::{query, Row};
 
-use crate::metadata::language::Language;
+use crate::metadata::Language;
 
-use super::Db;
+use super::{BoxedFuture, DatabaseObject, Result};
 
-impl<'c> Db<'c, sqlx::Sqlite, i32> for Language {
-    type Error = super::Error;
+impl DatabaseObject for Language {
+    type Database = sqlx::Sqlite;
+    type Id = u32;
+    const TABLE_NAME: &str = "language";
 
-    fn write_to_db<E>(&self, executor: E) -> impl Future<Output = Result<(), Self::Error>> + Send
+    fn write_to_db<'e, 'q, E>(&'e self, executor: E) -> BoxedFuture<'q, Result<()>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
+        'e: 'q,
     {
-        async move {
+        Box::pin(async move {
             query("INSERT INTO language(name, version) VALUES(?, ?)")
                 .bind(&self.name)
                 .bind(&self.version)
                 .execute(executor)
                 .await?;
             Ok(())
-        }
+        })
     }
 
-    fn from_db<E>(id: i32, executor: E) -> impl Future<Output = Result<Self, Self::Error>> + Send
+    fn from_db<'e, E>(id: Self::Id, executor: E) -> BoxedFuture<'e, Result<Self>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
     {
-        async move {
-            let row = query("SELECT name, version FROM language WHERE id = ?")
+        Box::pin(async move {
+            let row = query("SELECT id, name, version FROM language WHERE id = ?")
                 .bind(id)
                 .fetch_one(executor)
                 .await?;
 
+            let id: i32 = row.try_get("id")?;
             let name: &str = row.try_get("name")?;
             let version: &str = row.try_get("version")?;
 
-            Ok(Self {
-                name: name.to_string(),
-                version: version.to_string(),
-            })
-        }
+            Ok(Language::new(name, version).with_id(id))
+        })
     }
 }

@@ -20,6 +20,7 @@ pub mod ide;
 pub mod language;
 
 pub use build_system::BuildSystem;
+pub use category::Category;
 pub use ide::Ide;
 pub use language::Language;
 

@@ -11,13 +11,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let connection_string = dotenvy::var("DATABASE_URL")?;
     println!("Initializing db...");
 
-    let mut connection = SqliteConnection::connect(&connection_string).await?;
-    // category.write_to_db(&mut connection).await?;
-    let category = Category::from_db(1, &mut connection).await?;
-    println!("Retrieved Category: {:#?}", category);
-
-    let language = Language::from_db(1, &mut connection).await?;
-    println!("Received Language: {:#?}", language);
+    // let mut connection = SqliteConnection::connect(&connection_string).await?;
+    // // category.write_to_db(&mut connection).await?;
+    // let category = Category::from_db(1, &mut connection).await?;
+    // println!("Retrieved Category: {:#?}", category);
+    //
+    // let language = Language::from_db(1, &mut connection).await?;
+    // println!("Received Language: {:#?}", language);
 
     // let language = Language {
     //     name: "rust".to_string(),

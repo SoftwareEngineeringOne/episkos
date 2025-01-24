@@ -1,45 +1,42 @@
-use std::future::Future;
-
 use sqlx::{query, Row};
 
-use crate::metadata::ide::Ide;
+use crate::metadata::Ide;
 
-use super::Db;
+use super::{BoxedFuture, DatabaseObject, Result};
 
-impl<'c> Db<'c, sqlx::Sqlite, i32> for Ide {
-    type Error = super::Error;
+impl DatabaseObject for Ide {
+    type Database = sqlx::Sqlite;
+    type Id = u32;
+    const TABLE_NAME: &str = "ide";
 
-    fn write_to_db<E>(&self, executor: E) -> impl Future<Output = Result<(), Self::Error>> + Send
+    fn write_to_db<'e, 'q, E>(&'e self, executor: E) -> BoxedFuture<'q, Result<()>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
+        'e: 'q,
     {
-        async move {
-            query("INSERT INTO ide(name, version) VALUES(?, ?)")
+        Box::pin(async move {
+            query("INSERT INTO ide(name) VALUES(?)")
                 .bind(&self.name)
-                .bind(&self.version)
                 .execute(executor)
                 .await?;
             Ok(())
-        }
+        })
     }
 
-    fn from_db<E>(id: i32, executor: E) -> impl Future<Output = Result<Self, Self::Error>> + Send
+    fn from_db<'e, E>(id: Self::Id, executor: E) -> BoxedFuture<'e, Result<Self>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
     {
-        async move {
-            let row = query("SELECT name, version FROM ide WHERE id = ?")
+        Box::pin(async move {
+            let row = query("SELECT id,name FROM ide WHERE id = ?")
                 .bind(id)
                 .fetch_one(executor)
                 .await?;
 
             let name: &str = row.try_get("name")?;
-            let version: &str = row.try_get("version")?;
+            let id: i32 = row.try_get("id")?;
 
-            Ok(Self {
-                name: name.to_string(),
-                version: version.to_string(),
-            })
-        }
+            Ok(Ide::new(name).with_id(id))
+        })
     }
 }

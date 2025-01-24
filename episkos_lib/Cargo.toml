@@ -16,7 +16,7 @@ uuid.workspace = true
 thiserror.workspace = true
 toml = "0.8.19"
 serde = { version = "1.0.217", features = ["derive"] }
-sqlx = { version = "0.8.3", features = ["chrono", "runtime-tokio", "sqlite", "uuid"] }
+sqlx = { version = "0.8.3", features = ["chrono", "runtime-tokio", "any", "uuid", "sqlite"] }
 tokio = { version = "1.43.0", features = ["full"] }
 dotenvy = "0.15.7"
 

@@ -2,41 +2,35 @@ use sqlx::{query, Row};
 
 use crate::metadata::BuildSystem;
 
-use super::{BoxedFuture, DatabaseObject, Result};
+use super::{DatabaseObject, Result};
 
-impl DatabaseObject for BuildSystem {
-    type Database = sqlx::Sqlite;
+impl<'c> DatabaseObject<'c> for BuildSystem {
+    type Id = i32;
+    const TABLE_NAME: &'c str = "build_system";
 
-    type Id = u32;
-
-    fn write_to_db<'e, E>(&self, executor: E) -> BoxedFuture<'e, Result<()>>
-    where
-        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
-    {
-        Box::pin(async move {
-            query("INSERT INTO build_system(name, version) VALUES(?, ?)")
-                .bind(&self.name)
-                .bind(&self.version)
-                .execute(executor)
-                .await?;
-            Ok(())
-        })
+    async fn write_to_db(&self, executor: impl sqlx::AnyExecutor<'_>) -> Result<()> {
+        query("INSERT INTO build_system(name, version) VALUES(?, ?)")
+            .bind(&self.name)
+            .bind(&self.version)
+            .execute(executor)
+            .await?;
+        Ok(())
     }
 
-    fn from_db<'e, E>(id: Self::Id, executor: E) -> BoxedFuture<'e, Result<Self>>
-    where
-        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
-    {
-        Box::pin(async move {
-            let row = query("SELECT name, version FROM build_system WHERE id = ?")
-                .bind(id)
-                .fetch_one(executor)
-                .await?;
+    async fn from_db(id: Self::Id, executor: impl sqlx::AnyExecutor<'_>) -> Result<Self> {
+        let row = query("SELECT id, name, version FROM build_system WHERE id = ?")
+            .bind(&id)
+            .fetch_one(executor)
+            .await?;
 
-            let name: &str = row.try_get("name")?;
-            let version: &str = row.try_get("version")?;
+        let id: i32 = row.try_get("id")?;
+        let name: &str = row.try_get("name")?;
+        let version: &str = row.try_get("version")?;
 
-            Ok(cat.into())
-        })
+        Ok(BuildSystem::new(name, version).with_id(id))
+    }
+
+    fn id(&self) -> Result<Self::Id> {
+        self.id
     }
 }
