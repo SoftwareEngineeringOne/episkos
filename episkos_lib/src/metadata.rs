@@ -15,6 +15,7 @@ use uuid::Uuid;
 
 pub mod build_system;
 mod builder;
+pub mod category;
 pub mod ide;
 pub mod language;
 
@@ -23,15 +24,6 @@ pub use ide::Ide;
 pub use language::Language;
 
 use crate::files::file_handler;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Category(pub String);
-
-impl From<&str> for Category {
-    fn from(value: &str) -> Self {
-        Category(value.to_string())
-    }
-}
 
 /// Core metadata structure containing information about a project.
 #[derive(Debug, Serialize, Deserialize)]
