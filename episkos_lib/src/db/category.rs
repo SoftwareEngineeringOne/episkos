@@ -1,32 +1,32 @@
-use std::future::Future;
-
 use sqlx::{query, Row};
 
 use crate::metadata::Category;
 
-use super::Db;
+use super::{BoxedFuture, DatabaseObject, Result};
 
-impl<'c> Db<'c, sqlx::Sqlite, i32> for Category {
-    type Error = super::Error;
+impl DatabaseObject for Category {
+    type Database = sqlx::Sqlite;
 
-    fn write_to_db<E>(&self, executor: E) -> impl Future<Output = Result<(), Self::Error>> + Send
+    type Id = u32;
+
+    fn write_to_db<'e, E>(&self, executor: E) -> BoxedFuture<'e, Result<()>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
     {
-        async move {
+        Box::pin(async move {
             query("INSERT INTO category(name) VALUES(?)")
                 .bind(&self.0)
                 .execute(executor)
                 .await?;
             Ok(())
-        }
+        })
     }
 
-    fn from_db<E>(id: i32, executor: E) -> impl Future<Output = Result<Self, Self::Error>> + Send
+    fn from_db<'e, E>(id: Self::Id, executor: E) -> BoxedFuture<'e, Result<Self>>
     where
-        E: sqlx::Executor<'c, Database = sqlx::Sqlite>,
+        E: 'e + sqlx::Executor<'e, Database = Self::Database>,
     {
-        async move {
+        Box::pin(async move {
             let row = query("SELECT name FROM category WHERE id = ?")
                 .bind(id)
                 .fetch_one(executor)
@@ -35,6 +35,6 @@ impl<'c> Db<'c, sqlx::Sqlite, i32> for Category {
             let cat: &str = row.try_get("name")?;
 
             Ok(cat.into())
-        }
+        })
     }
 }

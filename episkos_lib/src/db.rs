@@ -1,4 +1,4 @@
-use std::future::Future;
+use std::{future::Future, pin::Pin};
 
 use sqlx::Executor;
 use thiserror::Error;
@@ -9,16 +9,20 @@ pub mod category;
 pub mod ide;
 pub mod language;
 
-pub trait Db<'c, DB: sqlx::Database, ID>: Sized {
-    type Error;
+type BoxedFuture<'q, T> = Pin<Box<dyn Future<Output = T> + Send + 'q>>;
+type Result<T> = std::result::Result<T, Error>;
 
-    fn write_to_db<E>(&self, executor: E) -> impl Future<Output = Result<(), Self::Error>> + Send
-    where
-        E: Executor<'c, Database = DB>;
+pub trait DatabaseObject: Send + Sized {
+    type Database: sqlx::Database;
+    type Id;
 
-    fn from_db<E>(id: ID, executor: E) -> impl Future<Output = Result<Self, Self::Error>> + Send
+    fn write_to_db<'e, E>(&self, executor: E) -> BoxedFuture<'e, Result<()>>
     where
-        E: Executor<'c, Database = DB>;
+        E: 'e + Executor<'e, Database = Self::Database>;
+
+    fn from_db<'e, E>(id: Self::Id, executor: E) -> BoxedFuture<'e, Result<Self>>
+    where
+        E: 'e + Executor<'e, Database = Self::Database>;
 }
 
 #[derive(Debug, Error)]
