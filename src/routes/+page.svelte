@@ -13,14 +13,14 @@
 </script>
 
 <div
-	class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 transition-all duration-500"
+	class="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 transition-all duration-500"
 >
 	<Card.Root
-		class="w-[380px] backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl [--ring:267_100%_60%]"
+		class="w-[380px] backdrop-blur-xs bg-white/90 dark:bg-gray-800/90 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl [--ring:267_100%_60%]"
 	>
 		<Card.Header class="space-y-2">
 			<Card.Title
-				class="text-3xl font-bold text-center bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent"
+				class="text-3xl font-bold text-center bg-linear-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent"
 			>
 				{#if gs.greet}
 					<p>{gs.greet}</p>
@@ -37,20 +37,20 @@
 						type="text"
 						placeholder="Enter your username"
 						bind:value={gs.name}
-						class="w-full px-4 py-2 rounded-lg outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 focus-visible:ring-purple-500 focus-visible:ring-offset-2 transition-all duration-200"
+						class="w-full px-4 py-2 rounded-lg outline-hidden border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-purple-500 focus-visible:ring-purple-500 focus-visible:ring-offset-2 transition-all duration-200"
 					/>
 				{/if}
 				{#if gs.name && !gs.greet}
 					<Button
 						type="submit"
-						class="w-full bg-gradient-to-r from-indigo-500 to-pink-500 hover:opacity-90 transition-opacity duration-200"
+						class="w-full bg-linear-to-r from-indigo-500 to-pink-500 hover:opacity-90 transition-opacity duration-200"
 					>
 						Say Hello
 					</Button>
 				{:else if gs.greet}
 					<Button
 						{onclick}
-						class="w-full bg-gradient-to-r from-indigo-500 to-pink-500 hover:opacity-90 transition-opacity duration-200"
+						class="w-full bg-linear-to-r from-indigo-500 to-pink-500 hover:opacity-90 transition-opacity duration-200"
 						>Reset</Button
 					>
 				{/if}
